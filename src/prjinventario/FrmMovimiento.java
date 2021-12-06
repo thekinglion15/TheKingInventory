@@ -6,7 +6,21 @@
 package prjinventario;
 
 import java.sql.*;
+import java.io.*;
+import java.util.*;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class FrmMovimiento extends javax.swing.JFrame {
     
@@ -153,6 +167,89 @@ public class FrmMovimiento extends javax.swing.JFrame {
         }
     }
     
+    void JasperReport()
+    {
+        //Extraigo el ultimo codigo, el cual es el de la factura
+        String scriptcodigo = "select codigomov from movimiento order by codigomov desc limit 1";
+        String codigomov = "";
+        
+        try
+        {
+            Statement query = ObjDB.conectar().createStatement();
+            ResultSet resultado = query.executeQuery(scriptcodigo);
+
+            while(resultado.next())
+            {
+                codigomov = resultado.getString(1);
+            }
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error: " + ex);
+        }
+        
+        //Extraigo los datos de la base para pasarlo a la clase
+        String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigomov;
+        
+        try
+        {
+            DatosMovimiento datos = new DatosMovimiento();
+                
+            Statement query = ObjDB.conectar().createStatement();
+            ResultSet resultado = query.executeQuery(script);
+
+            while(resultado.next())
+            {
+                datos.setCodigo(Integer.parseInt(resultado.getString(1)));
+                datos.setArticulo(resultado.getString(2));
+                datos.setDescripcion(resultado.getString(3));
+                datos.setCantidad(Integer.parseInt(resultado.getString(4)));
+                datos.setTipo(resultado.getString(5));
+            }
+            
+            //Ubicación del archivo de salida para crear un informe en formato PDF
+            String salidaPDF = "C:\\Users\\kinglion\\Desktop\\JasperReport\\Reportes\\" + "Movimiento_" + codigomov + ".pdf";
+            
+            //Lista para guardar elementos
+            List<DatosMovimiento> lista = new ArrayList<DatosMovimiento>();
+
+            /* Agregar elementos a la lista */
+            lista.add(datos);
+            
+            //Convertir lista en JRBeanCollectionDataSource
+            JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
+            
+            //Mapa para contener los parámetros del informe Jaspers
+            Map<String, Object> parametros = new HashMap<String, Object>();
+            parametros.put("CollectionBeanParam", JRBeanItems);
+            
+            //Leer el archivo jrxml y crear el objeto JasperDesign
+            InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Movimiento.jrxml"));
+            JasperDesign JasperDesign = JRXmlLoader.load(archivo);
+            
+            //Compilar jrxml con la ayuda de la clase JasperReport
+            JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
+            
+            //Usando el objeto JasperReport para generar PDF
+            JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
+            
+            //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
+            JasperViewer.viewReport(JasperPrint);
+            
+            //OutputStream para crear PDF
+            OutputStream os = new FileOutputStream(new File(salidaPDF));
+
+            //Escribir contenido en un archivo PDF
+            JasperExportManager.exportReportToPdfStream(JasperPrint, os);
+
+            System.out.println("Archivo generado");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error: " + ex);
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -172,6 +269,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
         CmbArticulo = new javax.swing.JComboBox<>();
         CmbMov = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MenuBuscar = new javax.swing.JMenuItem();
@@ -267,6 +365,14 @@ public class FrmMovimiento extends javax.swing.JFrame {
         jLabel6.setText("Cantidad");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, 70, 20));
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, -1, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 280));
 
         jMenu1.setText("Archivo");
@@ -328,6 +434,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
 
     private void BtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGuardarActionPerformed
         Guardar();
+        JasperReport();
     }//GEN-LAST:event_BtnGuardarActionPerformed
 
     private void MenuBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuBuscarActionPerformed
@@ -338,7 +445,12 @@ public class FrmMovimiento extends javax.swing.JFrame {
 
     private void MenuGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuGuardarActionPerformed
         Guardar();
+        JasperReport();
     }//GEN-LAST:event_MenuGuardarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        JasperReport();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -385,6 +497,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
     private javax.swing.JSpinner TxtCantidad;
     public javax.swing.JTextField TxtCodigo;
     private javax.swing.JTextArea TxtDescripcion;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
