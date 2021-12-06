@@ -5,13 +5,27 @@
  */
 package prjinventario;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class DatosMovimiento {
+    private int codigomov;
     private int codigo;
+    private String compania;
     private String articulo;
     private String descripcion;
     private int cantidad;
     private String tipo;
+    private String fecha;
+    
+    public int getCodigoMov() {
+        return codigomov;
+    }
 
+    public void setCodigoMov(int codigomov) {
+        this.codigomov = codigomov;
+    }
+    
     public int getCodigo() {
         return codigo;
     }
@@ -20,6 +34,14 @@ public class DatosMovimiento {
         this.codigo = codigo;
     }
 
+    public String getCompania() {
+        return compania;
+    }
+
+    public void setCompania(String compania) {
+        this.compania = compania;
+    }
+    
     public String getArticulo() {
         return articulo;
     }
@@ -50,5 +72,23 @@ public class DatosMovimiento {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+    
+    public String getFecha() {
+        return fecha;
+    }
+    
+    public void setFecha(String fecha)
+    {
+        this.fecha = fecha;
+    }
+    
+    public String fechaActual()
+    {
+        String actual;
+        DateTimeFormatter fechactual = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm");
+        actual = fechactual.format(LocalDateTime.now());
+        
+        return actual;
     }
 }

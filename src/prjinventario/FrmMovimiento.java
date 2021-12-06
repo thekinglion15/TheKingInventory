@@ -7,6 +7,8 @@ package prjinventario;
 
 import java.sql.*;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -94,11 +96,15 @@ public class FrmMovimiento extends javax.swing.JFrame {
     
     public void Guardar()
     {
+        DateTimeFormatter fechactual = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm");
+        
         String codigo = TxtCodigo.getText();
+        String compania;
         String articulo = (String) CmbArticulo.getSelectedItem();
         String descripcion = TxtDescripcion.getText();
         String cantidadMov = String.valueOf(TxtCantidad.getValue());
         String movimiento = (String) CmbMov.getSelectedItem();
+        String fecha = fechactual.format(LocalDateTime.now());
         
         int cambio = 0;
         int stock = Integer.parseInt(cantidadStock);
@@ -167,7 +173,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
         }
     }
     
-    void JasperReport()
+    public void JasperReport()
     {
         //Extraigo el ultimo codigo, el cual es el de la factura
         String scriptcodigo = "select codigomov from movimiento order by codigomov desc limit 1";
@@ -189,7 +195,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
         }
         
         //Extraigo los datos de la base para pasarlo a la clase
-        String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigomov;
+        String script = "select codigomov, codigo, compania, articulo, descripcion, cantidad, tipo, fecha from movimiento where codigomov = " + codigomov;
         
         try
         {
@@ -200,11 +206,14 @@ public class FrmMovimiento extends javax.swing.JFrame {
 
             while(resultado.next())
             {
-                datos.setCodigo(Integer.parseInt(resultado.getString(1)));
-                datos.setArticulo(resultado.getString(2));
-                datos.setDescripcion(resultado.getString(3));
-                datos.setCantidad(Integer.parseInt(resultado.getString(4)));
-                datos.setTipo(resultado.getString(5));
+                datos.setCodigoMov(Integer.parseInt(resultado.getString(1)));
+                datos.setCodigo(Integer.parseInt(resultado.getString(2)));
+                datos.setCompania(resultado.getString(3));
+                datos.setArticulo(resultado.getString(4));
+                datos.setDescripcion(resultado.getString(5));
+                datos.setCantidad(Integer.parseInt(resultado.getString(6)));
+                datos.setTipo(resultado.getString(7));
+                datos.setFecha(resultado.getString(8));
             }
             
             //Ubicación del archivo de salida para crear un informe en formato PDF

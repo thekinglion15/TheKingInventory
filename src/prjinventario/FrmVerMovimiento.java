@@ -5,14 +5,30 @@
  */
 package prjinventario;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.*;
 import java.util.*;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class FrmVerMovimiento extends javax.swing.JFrame {
 
     ClassDatabase ObjDB = ClassDatabase.getInstance();
     Connection conexion;
+    String codigoSeleccion;
     
     public FrmVerMovimiento() {
         initComponents();
@@ -54,15 +70,72 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
             System.out.println("Error: " + ex);
         }
     }
+    
+    public void JasperReport()
+    {
+        //Extraigo los datos de la base para pasarlo a la clase
+        String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigoSeleccion;
+        
+        try
+        {
+            DatosMovimiento datos = new DatosMovimiento();
+                
+            Statement query = ObjDB.conectar().createStatement();
+            ResultSet resultado = query.executeQuery(script);
+
+            while(resultado.next())
+            {
+                datos.setCodigo(Integer.parseInt(resultado.getString(1)));
+                datos.setArticulo(resultado.getString(2));
+                datos.setDescripcion(resultado.getString(3));
+                datos.setCantidad(Integer.parseInt(resultado.getString(4)));
+                datos.setTipo(resultado.getString(5));
+            }
+            
+            //Lista para guardar elementos
+            List<DatosMovimiento> lista = new ArrayList<DatosMovimiento>();
+
+            /* Agregar elementos a la lista */
+            lista.add(datos);
+            
+            //Convertir lista en JRBeanCollectionDataSource
+            JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
+            
+            //Mapa para contener los parámetros del informe Jaspers
+            Map<String, Object> parametros = new HashMap<String, Object>();
+            parametros.put("CollectionBeanParam", JRBeanItems);
+            
+            //Leer el archivo jrxml y crear el objeto JasperDesign
+            InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Movimiento.jrxml"));
+            JasperDesign JasperDesign = JRXmlLoader.load(archivo);
+            
+            //Compilar jrxml con la ayuda de la clase JasperReport
+            JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
+            
+            //Usando el objeto JasperReport para generar PDF
+            JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
+            
+            //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
+            JasperViewer.viewReport(JasperPrint);
+
+            System.out.println("Archivo generado");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error: " + ex);
+        }
+    }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        BtnSalir = new javax.swing.JButton();
+        BtnReporte = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabla = new javax.swing.JTable();
+        BtnSalir = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MenuSalir = new javax.swing.JMenuItem();
@@ -75,17 +148,17 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        BtnSalir.setBackground(new java.awt.Color(255, 255, 255));
-        BtnSalir.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
-        BtnSalir.setForeground(new java.awt.Color(255, 255, 255));
-        BtnSalir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Salir Grande.png"))); // NOI18N
-        BtnSalir.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        BtnSalir.addActionListener(new java.awt.event.ActionListener() {
+        BtnReporte.setBackground(new java.awt.Color(255, 255, 255));
+        BtnReporte.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
+        BtnReporte.setForeground(new java.awt.Color(255, 255, 255));
+        BtnReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Reporte.png"))); // NOI18N
+        BtnReporte.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        BtnReporte.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnSalirActionPerformed(evt);
+                BtnReporteActionPerformed(evt);
             }
         });
-        jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 32, 32));
+        jPanel1.add(BtnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 32, 32));
 
         tabla.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
         tabla.setModel(new javax.swing.table.DefaultTableModel(
@@ -122,6 +195,18 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 450, 190));
 
+        BtnSalir.setBackground(new java.awt.Color(255, 255, 255));
+        BtnSalir.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
+        BtnSalir.setForeground(new java.awt.Color(255, 255, 255));
+        BtnSalir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Salir Grande.png"))); // NOI18N
+        BtnSalir.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        BtnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnSalirActionPerformed(evt);
+            }
+        });
+        jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, 32, 32));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 470, 250));
 
         jMenuBar1.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
@@ -147,17 +232,23 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void BtnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSalirActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_BtnSalirActionPerformed
+    private void BtnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnReporteActionPerformed
+        JasperReport();
+    }//GEN-LAST:event_BtnReporteActionPerformed
 
     private void MenuSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuSalirActionPerformed
         this.dispose();
     }//GEN-LAST:event_MenuSalirActionPerformed
 
     private void tablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMouseClicked
+        int seleccion = tabla.rowAtPoint(evt.getPoint());
         
+        codigoSeleccion = String.valueOf(tabla.getValueAt(seleccion, 0));
     }//GEN-LAST:event_tablaMouseClicked
+
+    private void BtnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSalirActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_BtnSalirActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -193,6 +284,7 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BtnReporte;
     private javax.swing.JButton BtnSalir;
     private javax.swing.JMenuItem MenuSalir;
     private javax.swing.JMenu jMenu1;
