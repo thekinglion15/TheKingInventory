@@ -194,8 +194,8 @@ public class FrmMovimiento extends javax.swing.JFrame {
         }
         
         //Extraigo los datos de la base para pasarlo a la clase
-        String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigomov;
-        
+        String script = "select * from movimiento where codigomov = " + codigomov;king
+        System.out.println("0");
         try
         {
             DatosMovimiento datos = new DatosMovimiento();
@@ -214,7 +214,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
                 datos.setTipo(resultado.getString(7));
                 datos.setFecha(resultado.getString(8));
             }
-            
+            System.out.println("1");
             //Ubicación del archivo de salida para crear un informe en formato PDF
             String salidaPDF = "C:\\Users\\kinglion\\Desktop\\JasperReport\\Reportes\\" + "Movimiento_" + codigomov + ".pdf";
             
@@ -223,7 +223,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
             
             /* Agregar elementos a la lista */
             lista.add(datos);
-            
+            System.out.println("2");
             //Convertir lista en JRBeanCollectionDataSource
             JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
             
@@ -234,13 +234,13 @@ public class FrmMovimiento extends javax.swing.JFrame {
             //Leer el archivo jrxml y crear el objeto JasperDesign
             InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Movimiento.jrxml"));
             JasperDesign JasperDesign = JRXmlLoader.load(archivo);
-            
+            System.out.println("3");
             //Compilar jrxml con la ayuda de la clase JasperReport
             JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
             
             //Usando el objeto JasperReport para generar PDF
             JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
-            
+            System.out.println("4");
             //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
             JasperViewer.viewReport(JasperPrint);
             
