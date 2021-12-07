@@ -194,7 +194,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
         }
         
         //Extraigo los datos de la base para pasarlo a la clase
-        String script = "select * from movimiento where codigomov = " + codigomov;king
+        String script = "select * from movimiento where codigomov = " + codigomov;
         System.out.println("0");
         try
         {
