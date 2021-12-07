@@ -74,7 +74,8 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
     public void JasperReport()
     {
         //Extraigo los datos de la base para pasarlo a la clase
-        String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigoSeleccion;
+        //String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigoSeleccion;
+        String script = "select * from movimiento where codigomov = " + codigoSeleccion;
         
         try
         {
@@ -85,11 +86,32 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
 
             while(resultado.next())
             {
-                datos.setCodigo(Integer.parseInt(resultado.getString(1)));
-                datos.setArticulo(resultado.getString(2));
-                datos.setDescripcion(resultado.getString(3));
-                datos.setCantidad(Integer.parseInt(resultado.getString(4)));
-                datos.setTipo(resultado.getString(5));
+                datos.setCodigoMov(12345);
+                datos.setCodigo(12345);
+                datos.setCompania("vbnjk");
+                datos.setArticulo("vhjk");
+                datos.setDescripcion("ghjk");
+                datos.setCantidad(234);
+                datos.setTipo("ghjk");
+                datos.setFecha("bjk");
+                /*
+                datos.setCodigoMov(Integer.parseInt(resultado.getString(1)));
+                datos.setCodigo(Integer.parseInt(resultado.getString(2)));
+                datos.setCompania(resultado.getString(3));
+                datos.setArticulo(resultado.getString(4));
+                datos.setDescripcion(resultado.getString(5));
+                datos.setCantidad(Integer.parseInt(resultado.getString(6)));
+                datos.setTipo(resultado.getString(7));
+                datos.setFecha(resultado.getString(8));
+                
+                System.out.println(datos.getCodigoMov());
+                System.out.println(datos.getCodigo());
+                System.out.println(datos.getCompania());
+                System.out.println(datos.getArticulo());
+                System.out.println(datos.getDescripcion());
+                System.out.println(datos.getCantidad());
+                System.out.println(datos.getTipo());
+                System.out.println(datos.getFecha());*/
             }
             
             //Lista para guardar elementos
@@ -111,7 +133,7 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
             
             //Compilar jrxml con la ayuda de la clase JasperReport
             JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
-            
+            System.out.println("0");
             //Usando el objeto JasperReport para generar PDF
             JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
             
@@ -126,7 +148,6 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
         }
     }
     
-
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -166,11 +187,11 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Cod. Movimiento", "Cod. Articulo", "Articulo", "Descripción", "Cantidad", "Tipo"
+                "Cod. Movimiento", "Cod. Articulo", "Cliente", "Articulo", "Descripción", "Cantidad", "Tipo", "Fecha"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -191,9 +212,11 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
             tabla.getColumnModel().getColumn(3).setResizable(false);
             tabla.getColumnModel().getColumn(4).setResizable(false);
             tabla.getColumnModel().getColumn(5).setResizable(false);
+            tabla.getColumnModel().getColumn(6).setResizable(false);
+            tabla.getColumnModel().getColumn(7).setResizable(false);
         }
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 450, 190));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 610, 250));
 
         BtnSalir.setBackground(new java.awt.Color(255, 255, 255));
         BtnSalir.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
@@ -207,7 +230,7 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
         });
         jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, 32, 32));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 470, 250));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 630, 310));
 
         jMenuBar1.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
 

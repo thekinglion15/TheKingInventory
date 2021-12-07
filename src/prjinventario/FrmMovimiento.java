@@ -28,7 +28,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
     
     ClassDatabase ObjDB = ClassDatabase.getInstance();
     Connection conexion;
-    String codigoBuscar, cantidadStock;
+    String codigoBuscar, cantidadStock, company;
     
     public FrmMovimiento(String codBuscar) {
         initComponents();
@@ -86,6 +86,15 @@ public class FrmMovimiento extends javax.swing.JFrame {
                 TxtDescripcion.setText("");
                 TxtCantidad.setValue(Integer.parseInt(cantidadStock));
                 CmbMov.setSelectedIndex(0);
+                
+                String script2 = "select nombre from cliente where articulo = '" + articulo + "'";
+                
+                resultado = query.executeQuery(script2);
+                
+                while(resultado.next())
+                {
+                    company = resultado.getString(1);
+                }
             }
             catch(Exception ex)
             {
@@ -99,7 +108,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
         DateTimeFormatter fechactual = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm");
         
         String codigo = TxtCodigo.getText();
-        String compania;
+        String compania = company;
         String articulo = (String) CmbArticulo.getSelectedItem();
         String descripcion = TxtDescripcion.getText();
         String cantidadMov = String.valueOf(TxtCantidad.getValue());
@@ -129,37 +138,27 @@ public class FrmMovimiento extends javax.swing.JFrame {
             {
                 try
                 {
-                    PreparedStatement guardar = ObjDB.conectar().prepareStatement("insert into movimiento values(?,?,?,?,?,?)");
+                    PreparedStatement guardar = ObjDB.conectar().prepareStatement("insert into movimiento values(?,?,?,?,?,?,?,?)");
 
                     guardar.setString(1, "0");
                     guardar.setString(2, codigo);
-                    guardar.setString(3, articulo);
-                    guardar.setString(4, descripcion);
-                    guardar.setString(5, cantidadMov);
-                    guardar.setString(6, movimiento);
+                    guardar.setString(3, compania);
+                    guardar.setString(4, articulo);
+                    guardar.setString(5, descripcion);
+                    guardar.setString(6, cantidadMov);
+                    guardar.setString(7, movimiento);
+                    guardar.setString(8, fecha);
                     guardar.executeUpdate();
 
                     JOptionPane.showMessageDialog(null, "Datos guardados");
 
+                    JasperReport();
+                    
                     TxtCodigo.setText("");
                     CmbArticulo.setSelectedIndex(0);
                     TxtDescripcion.setText("");
                     TxtCantidad.setValue(0);
                     CmbArticulo.setSelectedIndex(0);
-
-                    try
-                    {
-                        String movi = String.valueOf(cambio);
-                        PreparedStatement actualizar = ObjDB.conectar().prepareStatement("update stock set cantidad = ? where codigo = ?");
-
-                        actualizar.setString(1, movi);
-                        actualizar.setString(2, codigo);
-                        actualizar.executeUpdate();
-                    }
-                    catch(Exception ex)
-                    {
-                        System.out.println("Error: " + ex);
-                    }
                 }
                 catch(Exception ex)
                 {
@@ -177,7 +176,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
     {
         //Extraigo el ultimo codigo, el cual es el de la factura
         String scriptcodigo = "select codigomov from movimiento order by codigomov desc limit 1";
-        String codigomov = "";
+        String codigomov = "0";
         
         try
         {
@@ -195,7 +194,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
         }
         
         //Extraigo los datos de la base para pasarlo a la clase
-        String script = "select codigomov, codigo, compania, articulo, descripcion, cantidad, tipo, fecha from movimiento where codigomov = " + codigomov;
+        String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigomov;
         
         try
         {
@@ -221,7 +220,7 @@ public class FrmMovimiento extends javax.swing.JFrame {
             
             //Lista para guardar elementos
             List<DatosMovimiento> lista = new ArrayList<DatosMovimiento>();
-
+            
             /* Agregar elementos a la lista */
             lista.add(datos);
             
@@ -443,7 +442,6 @@ public class FrmMovimiento extends javax.swing.JFrame {
 
     private void BtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGuardarActionPerformed
         Guardar();
-        JasperReport();
     }//GEN-LAST:event_BtnGuardarActionPerformed
 
     private void MenuBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuBuscarActionPerformed
@@ -454,7 +452,6 @@ public class FrmMovimiento extends javax.swing.JFrame {
 
     private void MenuGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuGuardarActionPerformed
         Guardar();
-        JasperReport();
     }//GEN-LAST:event_MenuGuardarActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

@@ -5,9 +5,6 @@
  */
 package prjinventario;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 public class DatosMovimiento {
     private int codigomov;
     private int codigo;
@@ -81,14 +78,5 @@ public class DatosMovimiento {
     public void setFecha(String fecha)
     {
         this.fecha = fecha;
-    }
-    
-    public String fechaActual()
-    {
-        String actual;
-        DateTimeFormatter fechactual = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm");
-        actual = fechactual.format(LocalDateTime.now());
-        
-        return actual;
     }
 }
