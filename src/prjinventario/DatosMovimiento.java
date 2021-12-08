@@ -14,7 +14,15 @@ public class DatosMovimiento {
     private int cantidad;
     private String tipo;
     private String fecha;
-    
+
+    public int getCodigomov() {
+        return codigomov;
+    }
+
+    public void setCodigomov(int codigomov) {
+        this.codigomov = codigomov;
+    }
+    /*
     public int getCodigoMov() {
         return codigomov;
     }
@@ -22,7 +30,7 @@ public class DatosMovimiento {
     public void setCodigoMov(int codigomov) {
         this.codigomov = codigomov;
     }
-    
+    */
     public int getCodigo() {
         return codigo;
     }
