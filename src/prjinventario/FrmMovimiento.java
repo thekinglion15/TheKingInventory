@@ -277,7 +277,6 @@ public class FrmMovimiento extends javax.swing.JFrame {
         CmbArticulo = new javax.swing.JComboBox<>();
         CmbMov = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MenuBuscar = new javax.swing.JMenuItem();
@@ -373,14 +372,6 @@ public class FrmMovimiento extends javax.swing.JFrame {
         jLabel6.setText("Cantidad");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, 70, 20));
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, -1, -1));
-
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 280));
 
         jMenu1.setText("Archivo");
@@ -454,10 +445,6 @@ public class FrmMovimiento extends javax.swing.JFrame {
         Guardar();
     }//GEN-LAST:event_MenuGuardarActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JasperReport();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -503,7 +490,6 @@ public class FrmMovimiento extends javax.swing.JFrame {
     private javax.swing.JSpinner TxtCantidad;
     public javax.swing.JTextField TxtCodigo;
     private javax.swing.JTextArea TxtDescripcion;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

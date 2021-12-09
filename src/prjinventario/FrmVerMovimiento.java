@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.*;
 import java.util.*;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -73,60 +74,66 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
     
     public void JasperReport()
     {
-        //Extraigo los datos de la base para pasarlo a la clase
-        //String script = "select codigo, articulo, descripcion, cantidad, tipo from movimiento where codigomov = " + codigoSeleccion;
-        String script = "select * from movimiento where codigomov = " + codigoSeleccion;
-        
-        try
+        if(codigoSeleccion != null)
         {
-            DatosMovimiento datos = new DatosMovimiento();
-                
-            Statement query = ObjDB.conectar().createStatement();
-            ResultSet resultado = query.executeQuery(script);
+            //Extraigo los datos de la base para pasarlo a la clase
+            String script = "select * from movimiento where codigomov = " + codigoSeleccion;
 
-            while(resultado.next())
+            try
             {
-                datos.setCodigomov(Integer.parseInt(resultado.getString(1)));
-                datos.setCodigo(Integer.parseInt(resultado.getString(2)));
-                datos.setCompania(resultado.getString(3));
-                datos.setArticulo(resultado.getString(4));
-                datos.setDescripcion(resultado.getString(5));
-                datos.setCantidad(Integer.parseInt(resultado.getString(6)));
-                datos.setTipo(resultado.getString(7));
-                datos.setFecha(resultado.getString(8));
+                DatosMovimiento datos = new DatosMovimiento();
+
+                Statement query = ObjDB.conectar().createStatement();
+                ResultSet resultado = query.executeQuery(script);
+
+                while(resultado.next())
+                {
+                    datos.setCodigomov(Integer.parseInt(resultado.getString(1)));
+                    datos.setCodigo(Integer.parseInt(resultado.getString(2)));
+                    datos.setCompania(resultado.getString(3));
+                    datos.setArticulo(resultado.getString(4));
+                    datos.setDescripcion(resultado.getString(5));
+                    datos.setCantidad(Integer.parseInt(resultado.getString(6)));
+                    datos.setTipo(resultado.getString(7));
+                    datos.setFecha(resultado.getString(8));
+                }
+
+                //Lista para guardar elementos
+                List<DatosMovimiento> lista = new ArrayList<DatosMovimiento>();
+
+                /* Agregar elementos a la lista */
+                lista.add(datos);
+
+                //Convertir lista en JRBeanCollectionDataSource
+                JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
+
+                //Mapa para contener los parámetros del informe Jaspers
+                Map<String, Object> parametros = new HashMap<String, Object>();
+                parametros.put("CollectionBeanParam", JRBeanItems);
+
+                //Leer el archivo jrxml y crear el objeto JasperDesign
+                InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Movimiento.jrxml"));
+                JasperDesign JasperDesign = JRXmlLoader.load(archivo);
+
+                //Compilar jrxml con la ayuda de la clase JasperReport
+                JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
+
+                //Usando el objeto JasperReport para generar PDF
+                JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
+
+                //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
+                JasperViewer.viewReport(JasperPrint);
+
+                System.out.println("Archivo generado");
             }
-            
-            //Lista para guardar elementos
-            List<DatosMovimiento> lista = new ArrayList<DatosMovimiento>();
-
-            /* Agregar elementos a la lista */
-            lista.add(datos);
-            
-            //Convertir lista en JRBeanCollectionDataSource
-            JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
-            
-            //Mapa para contener los parámetros del informe Jaspers
-            Map<String, Object> parametros = new HashMap<String, Object>();
-            parametros.put("CollectionBeanParam", JRBeanItems);
-            
-            //Leer el archivo jrxml y crear el objeto JasperDesign
-            InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Movimiento.jrxml"));
-            JasperDesign JasperDesign = JRXmlLoader.load(archivo);
-            
-            //Compilar jrxml con la ayuda de la clase JasperReport
-            JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
-            
-            //Usando el objeto JasperReport para generar PDF
-            JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
-            
-            //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
-            JasperViewer.viewReport(JasperPrint);
-
-            System.out.println("Archivo generado");
+            catch(Exception ex)
+            {
+                System.out.println("Error: " + ex);
+            }
         }
-        catch(Exception ex)
+        else
         {
-            System.out.println("Error: " + ex);
+            JOptionPane.showMessageDialog(null, "Seleccione un registro");
         }
     }
     
