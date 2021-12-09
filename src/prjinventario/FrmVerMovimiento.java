@@ -115,7 +115,7 @@ public class FrmVerMovimiento extends javax.swing.JFrame {
             
             //Compilar jrxml con la ayuda de la clase JasperReport
             JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
-            System.out.println("0");
+            
             //Usando el objeto JasperReport para generar PDF
             JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
             

@@ -22,15 +22,7 @@ public class DatosMovimiento {
     public void setCodigomov(int codigomov) {
         this.codigomov = codigomov;
     }
-    /*
-    public int getCodigoMov() {
-        return codigomov;
-    }
-
-    public void setCodigoMov(int codigomov) {
-        this.codigomov = codigomov;
-    }
-    */
+    
     public int getCodigo() {
         return codigo;
     }

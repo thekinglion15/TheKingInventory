@@ -5,8 +5,24 @@
  */
 package prjinventario;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class FrmMantCliente extends javax.swing.JFrame {
     
@@ -171,11 +187,66 @@ public class FrmMantCliente extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Busque a quien desea eliminar");
         }
     }
+    
+    public void JasperReport()
+    {
+        //Extraigo los datos de la base para pasarlo a la clase
+        String script = "select codigo, nombre, direccion, telefono from cliente";
+        
+        try
+        {
+            //Lista para guardar elementos
+            List<DatosCliente> lista = new ArrayList<DatosCliente>();
+            
+            Statement query = ObjDB.conectar().createStatement();
+            ResultSet resultado = query.executeQuery(script);
+
+            while(resultado.next())
+            {
+                DatosCliente datos = new DatosCliente();
+                
+                datos.setCodigo(Integer.parseInt(resultado.getString(1)));
+                datos.setNombre(resultado.getString(2));
+                datos.setDireccion(resultado.getString(3));
+                datos.setTelefono(resultado.getString(4));
+                
+                //Agregar elementos a la lista
+                lista.add(datos);
+            }
+            
+            //Convertir lista en JRBeanCollectionDataSource
+            JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
+            
+            //Mapa para contener los parámetros del informe Jaspers
+            Map<String, Object> parametros = new HashMap<String, Object>();
+            parametros.put("CollectionBeanParam", JRBeanItems);
+            
+            //Leer el archivo jrxml y crear el objeto JasperDesign
+            InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Cliente.jrxml"));
+            JasperDesign JasperDesign = JRXmlLoader.load(archivo);
+            
+            //Compilar jrxml con la ayuda de la clase JasperReport
+            JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
+            
+            //Usando el objeto JasperReport para generar PDF
+            JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
+            
+            //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
+            JasperViewer.viewReport(JasperPrint);
+
+            System.out.println("Archivo generado");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error: " + ex);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        BtnReporte = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         BtnNuevo = new javax.swing.JButton();
         BtnBuscar = new javax.swing.JButton();
@@ -192,6 +263,7 @@ public class FrmMantCliente extends javax.swing.JFrame {
         TxtTelefono = new javax.swing.JFormattedTextField();
         TxtArticulo = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
+        BtnReporte1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MenuNuevo = new javax.swing.JMenuItem();
@@ -200,6 +272,17 @@ public class FrmMantCliente extends javax.swing.JFrame {
         MenuSalir = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         MenuEliminar = new javax.swing.JMenuItem();
+
+        BtnReporte.setBackground(new java.awt.Color(255, 255, 255));
+        BtnReporte.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
+        BtnReporte.setForeground(new java.awt.Color(255, 255, 255));
+        BtnReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Reporte.png"))); // NOI18N
+        BtnReporte.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        BtnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnReporteActionPerformed(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cliente");
@@ -272,7 +355,7 @@ public class FrmMantCliente extends javax.swing.JFrame {
                 BtnSalirActionPerformed(evt);
             }
         });
-        jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 32, 32));
+        jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 0, 32, 32));
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jLabel2.setText("Dirección");
@@ -314,6 +397,18 @@ public class FrmMantCliente extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jLabel6.setText("Articulo");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 70, 20));
+
+        BtnReporte1.setBackground(new java.awt.Color(255, 255, 255));
+        BtnReporte1.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
+        BtnReporte1.setForeground(new java.awt.Color(255, 255, 255));
+        BtnReporte1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Reporte.png"))); // NOI18N
+        BtnReporte1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        BtnReporte1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnReporte1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(BtnReporte1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 32, 32));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 210));
 
@@ -439,6 +534,14 @@ public class FrmMantCliente extends javax.swing.JFrame {
         Eliminar();
     }//GEN-LAST:event_MenuEliminarActionPerformed
 
+    private void BtnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnReporteActionPerformed
+        JasperReport();
+    }//GEN-LAST:event_BtnReporteActionPerformed
+
+    private void BtnReporte1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnReporte1ActionPerformed
+        JasperReport();
+    }//GEN-LAST:event_BtnReporte1ActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -477,6 +580,8 @@ public class FrmMantCliente extends javax.swing.JFrame {
     private javax.swing.JButton BtnEliminar;
     private javax.swing.JButton BtnGuardar;
     private javax.swing.JButton BtnNuevo;
+    private javax.swing.JButton BtnReporte;
+    private javax.swing.JButton BtnReporte1;
     private javax.swing.JButton BtnSalir;
     private javax.swing.JMenuItem MenuBuscar;
     private javax.swing.JMenuItem MenuEliminar;

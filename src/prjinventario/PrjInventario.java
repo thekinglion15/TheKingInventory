@@ -26,8 +26,6 @@ public class PrjInventario {
             Statement script = ObjDB.conectar().createStatement();
             script.execute("SET GLOBAL time_zone = '-3:00';");
             System.out.println("Conexion exitosa");
-            
-            //ObjDB.cierra();
         }
         catch(SQLException ex)
         {
@@ -39,8 +37,5 @@ public class PrjInventario {
         
         //Mostrando el formulario de login
         ObjLogin.setVisible(true);
-        /*
-        FrmPrincipal obj = new FrmPrincipal();
-                obj.show();*/
     }
 }

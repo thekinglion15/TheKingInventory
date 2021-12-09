@@ -5,8 +5,24 @@
  */
 package prjinventario;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class FrmMantEmpleados extends javax.swing.JFrame {
     
@@ -189,6 +205,61 @@ public class FrmMantEmpleados extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Busque a quien desea eliminar");
         }
     }
+    
+    public void JasperReport()
+    {
+        //Extraigo los datos de la base para pasarlo a la clase
+        String script = "select codigo, cedula, nombre, area, sueldo from empleado";
+        
+        try
+        {
+            //Lista para guardar elementos
+            List<DatosEmpleados> lista = new ArrayList<DatosEmpleados>();
+            
+            Statement query = ObjDB.conectar().createStatement();
+            ResultSet resultado = query.executeQuery(script);
+
+            while(resultado.next())
+            {
+                DatosEmpleados datos = new DatosEmpleados();
+                
+                datos.setCodigo(Integer.parseInt(resultado.getString(1)));
+                datos.setCedula(resultado.getString(2));
+                datos.setNombre(resultado.getString(3));
+                datos.setArea(resultado.getString(4));
+                datos.setSueldo(Double.parseDouble(resultado.getString(5)));
+                
+                //Agregar elementos a la lista
+                lista.add(datos);
+            }
+            
+            //Convertir lista en JRBeanCollectionDataSource
+            JRBeanCollectionDataSource JRBeanItems = new JRBeanCollectionDataSource(lista);
+            
+            //Mapa para contener los parámetros del informe Jaspers
+            Map<String, Object> parametros = new HashMap<String, Object>();
+            parametros.put("CollectionBeanParam", JRBeanItems);
+            
+            //Leer el archivo jrxml y crear el objeto JasperDesign
+            InputStream archivo = new FileInputStream(new File("C:\\Users\\kinglion\\Desktop\\JasperReport\\JRXML\\Empleado.jrxml"));
+            JasperDesign JasperDesign = JRXmlLoader.load(archivo);
+            
+            //Compilar jrxml con la ayuda de la clase JasperReport
+            JasperReport JasperReport = JasperCompileManager.compileReport(JasperDesign);
+            
+            //Usando el objeto JasperReport para generar PDF
+            JasperPrint JasperPrint = JasperFillManager.fillReport(JasperReport, parametros, new JREmptyDataSource());
+            
+            //Llamar al motor Jasper para mostrar el informe en la ventana JasperViewer
+            JasperViewer.viewReport(JasperPrint);
+
+            System.out.println("Archivo generado");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error: " + ex);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -214,6 +285,7 @@ public class FrmMantEmpleados extends javax.swing.JFrame {
         TxtTelefono = new javax.swing.JFormattedTextField();
         CmbSexo = new javax.swing.JComboBox<>();
         TxtCedula = new javax.swing.JFormattedTextField();
+        BtnReporte = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MenuNuevo = new javax.swing.JMenuItem();
@@ -294,7 +366,7 @@ public class FrmMantEmpleados extends javax.swing.JFrame {
                 BtnSalirActionPerformed(evt);
             }
         });
-        jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 32, 32));
+        jPanel1.add(BtnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 0, 32, 32));
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jLabel2.setText("Sueldo");
@@ -356,6 +428,18 @@ public class FrmMantEmpleados extends javax.swing.JFrame {
         }
         TxtCedula.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         jPanel1.add(TxtCedula, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 80, 100, -1));
+
+        BtnReporte.setBackground(new java.awt.Color(255, 255, 255));
+        BtnReporte.setFont(new java.awt.Font("Times New Roman", 1, 11)); // NOI18N
+        BtnReporte.setForeground(new java.awt.Color(255, 255, 255));
+        BtnReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Reporte.png"))); // NOI18N
+        BtnReporte.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        BtnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnReporteActionPerformed(evt);
+            }
+        });
+        jPanel1.add(BtnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 32, 32));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 270));
 
@@ -485,6 +569,10 @@ public class FrmMantEmpleados extends javax.swing.JFrame {
         Eliminar();
     }//GEN-LAST:event_MenuEliminarActionPerformed
 
+    private void BtnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnReporteActionPerformed
+        JasperReport();
+    }//GEN-LAST:event_BtnReporteActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -525,6 +613,7 @@ public class FrmMantEmpleados extends javax.swing.JFrame {
     private javax.swing.JButton BtnEliminar;
     private javax.swing.JButton BtnGuardar;
     private javax.swing.JButton BtnNuevo;
+    private javax.swing.JButton BtnReporte;
     private javax.swing.JButton BtnSalir;
     private javax.swing.JComboBox<String> CmbSexo;
     private javax.swing.JMenuItem MenuBuscar;
